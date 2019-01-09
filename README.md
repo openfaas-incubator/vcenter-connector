@@ -32,11 +32,12 @@ export OPENFAAS_URL=http://127.0.0.1:31112
 
 git clone https://github.com/alexellis/echo-fn
 cd echo-fn
+faas-cli template store pull golang-http
 faas-cli deploy
 ```
 
 The `stack.yml` contains an annotation of `topic=vm.powered.on`, to change this edit the file and run `faas-cli deploy`. To edit the code in the handler change the code and `image` field then run `faas-cli up`
-```
+
 
 * Generate some events:
 
