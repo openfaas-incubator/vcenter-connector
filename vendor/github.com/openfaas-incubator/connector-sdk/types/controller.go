@@ -66,7 +66,6 @@ func synchronizeLookups(ticker *time.Ticker,
 	topicMap *TopicMap) {
 
 	for {
-		<-ticker.C
 		lookups, err := lookupBuilder.Build()
 		if err != nil {
 			log.Fatalln(err)
@@ -75,5 +74,7 @@ func synchronizeLookups(ticker *time.Ticker,
 		log.Println("Syncing topic map")
 		topicMap.Sync(&lookups)
 		log.Printf("Lookups: %v", lookups)
+
+		<-ticker.C
 	}
 }

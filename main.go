@@ -60,7 +60,7 @@ func main() {
 
 	config := types.ControllerConfig{
 		GatewayURL:      os.Getenv("OPENFAAS_URL"),
-		PrintResponse:   true,
+		PrintResponse:   false,
 		RebuildInterval: time.Second * 10,
 		UpstreamTimeout: time.Second * 15,
 	}
@@ -95,10 +95,10 @@ func bindEvents(c *vim25.Client, controller *types.Controller) error {
 			cancel()
 		}
 	}()
+	<-ctx.Done()
+	// done := make(chan bool)
 
-	done := make(chan bool)
-
-	<-done
+	// <-done
 
 	// controller.Invoke()
 
@@ -129,6 +129,12 @@ func makeRecv(controller *types.Controller, m *event.Manager) func(managedObject
 func handleEvent(event vtypes.BaseEvent, m *event.Manager) (string, string, error) {
 	eventType := reflect.TypeOf(event).Elem().Name()
 
+	gotEvent := event.GetEvent()
+	if gotEvent.Vm != nil {
+		log.Printf("VM: %s", gotEvent.Vm.Vm.Reference().String())
+	}
+	log.Printf("UserName: %s", gotEvent.UserName)
+
 	category, err := m.EventCategory(context.Background(), event)
 	if err != nil {
 		return "", "", errors.Wrap(err, "error retrieving event category")
@@ -139,16 +145,21 @@ func handleEvent(event vtypes.BaseEvent, m *event.Manager) (string, string, erro
 	topic := convertToTopic(eventType)
 
 	message, _ := json.Marshal(OutboundEvent{
-		Topic:    topic,
-		Category: category,
+		Topic:       topic,
+		Category:    category,
+		CreatedTime: gotEvent.CreatedTime,
+		UserName:    gotEvent.UserName,
 	})
 
 	return topic, string(message), nil
 }
 
 type OutboundEvent struct {
-	Topic    string
-	Category string
+	Topic    string `json:"topic,omitempty"`
+	Category string `json:"category,omitempty"`
+
+	UserName    string    `json:"userName,omitempty"`
+	CreatedTime time.Time `json:"createdTime,omitempty"`
 }
 
 func newVCenterClient(ctx context.Context, vcenterURL string, insecure bool) (*govmomi.Client, error) {
