@@ -28,7 +28,14 @@ go run main.go -vcenter-url="http://user:pass@127.0.0.1:8989/sdk" -insecure
 Deploy an echo function that subscribes to the event of "vm.powered.on"
 
 ```bash
-faas-cli deploy --annotation topic="vm.powered.on" --fprocess=/bin/cat -e write_debug=true --image=functions/alpine:latest --name vmware
+export OPENFAAS_URL=http://127.0.0.1:31112
+
+git clone https://github.com/alexellis/echo-fn
+cd echo-fn
+faas-cli deploy
+```
+
+The `stack.yml` contains an annotation of `topic=vm.powered.on`, to change this edit the file and run `faas-cli deploy`. To edit the code in the handler change the code and `image` field then run `faas-cli up`
 ```
 
 * Generate some events:
@@ -37,11 +44,16 @@ faas-cli deploy --annotation topic="vm.powered.on" --fprocess=/bin/cat -e write_
 GOVC_INSECURE=true GOVC_URL=http://user:pass@127.0.0.1:8989/sdk govc vm.power -off '*'
 ```
 
-* Check the logs of the vmware function
+* Check the logs of the `echo-fn` function
 
-```
-kubectl logs -n openfaas-fn deploy/vmware
-docker service logs vmware
+```bash
+# on Kubernetes
+
+kubectl logs -n openfaas-fn deploy/echo-fn
+
+# or on Swarm
+
+docker service logs echo-fn
 ```
 
 ## License
