@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: vcenter
+    component: vcenter-connector
+  name: vcenter-connector
+  namespace: openfaas
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vcenter
+        component: vcenter-connector
+    spec:
+      containers:
+      - name: vcenter
+        image: functions/vcenter-connector:0.1.0
+        command: ["./connector"]
+        args: ["--vcenter-url", "http://user:pass@vcsim.openfaas:8989/sdk", "--insecure"]
+        env:
+          - name: topics
+            value: "vm.powered.on,"
+          - name: basic_auth
+            value: "true"
+          - name: secret_mount_path
+            value: "/var/secrets/"
+        volumeMounts:
+            - name: auth
+              readOnly: true
+              mountPath: "/var/secrets/"
+      volumes:
+      - name: auth
+        secret:
+          secretName: basic-auth

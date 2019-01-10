@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: vcsim
+    component: vcsim-server
+  name: vcsim-server
+  namespace: openfaas
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vcsim
+        component: vcsim-server
+    spec:
+      containers:
+      - name: vcsim
+        image: docwareiy/vcsim:0.2.0
+        command: ["./vcsim"]
+        args: ["-tls", "false"]
+        ports:
+        - containerPort: 8989
