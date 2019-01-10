@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vcsim
+  labels:
+    app: vcsim
+    component: vcsim-server
+  namespace: openfaas
+spec:
+  ports:
+  - port: 8989
+    name: vcsim-port
+    targetPort: 8989
+    protocol: TCP
+  selector:
+    app: vcsim
+    component: vcsim-server
+---
