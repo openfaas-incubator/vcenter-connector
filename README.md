@@ -15,7 +15,11 @@ The code is under active development and only suitable for testing at this point
 * Run the vCenter Simulator
 
 ```bash
- ./vcsim -tls=false
+# Note: the following steps assume a correctly configured GO environment (using GOPATH)
+go get -u -d github.com/vmware/govmomi
+cd $GOPATH/src/github.com/vmware/govmomi/vcsim
+go build -o vcsim main.go
+./vcsim -tls=false
 ```
 
 * Run the connector
@@ -41,8 +45,11 @@ The `stack.yml` contains an annotation of `topic=vm.powered.on`, to change this 
 
 * Generate some events:
 
-```
-GOVC_INSECURE=true GOVC_URL=http://user:pass@127.0.0.1:8989/sdk govc vm.power -off '*'
+```bash
+# Note: the following steps assume you have already downloaded the govmomi sources as described above in the vcsim section
+cd $GOPATH/src/github.com/vmware/govmomi/govc
+go build -o govc main.go
+GOVC_INSECURE=true GOVC_URL=http://user:pass@127.0.0.1:8989/sdk ./govc vm.power -off '*'
 ```
 
 * Check the logs of the `echo-fn` function
