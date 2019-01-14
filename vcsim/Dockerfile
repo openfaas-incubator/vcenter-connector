@@ -1,8 +1,20 @@
-FROM golang:1.10.4 as builder
+FROM golang:1.11.4-alpine as builder
 
-RUN go get -u github.com/vmware/govmomi/vcsim
+RUN apk add git --no-cache
 
-FROM vmware/photon:2.0
+WORKDIR /root/go/src/github.com/vmware/
+RUN git clone https://github.com/vmware/govmomi
 
-COPY --from=builder /go/bin/vcsim .
-CMD ["./vcsim", "-httptest.serve", "0.0.0.0:443"]
+WORKDIR /root/go/src/github.com/vmware/govmomi
+ENV GOPATH=/root/go/
+# Building using -mod=vendor, which will utilize the v
+RUN CGO_ENABLED=0 GOOS=linux go build -o vcsim/vcsim vcsim/main.go
+
+FROM alpine:3.8
+
+WORKDIR /root/
+
+EXPOSE 8989
+COPY --from=builder //root/go/src/github.com/vmware/govmomi/vcsim/vcsim .
+
+CMD ["./vcsim", "-httptest.serve", ":8989", "-tls=false"]
