@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: vcsim
-        image: docwareiy/vcsim:0.2.0
+        image: docwareiy/vcsim:0.1.0-r
         command: ["./vcsim"]
-        args: ["-tls", "false"]
+        args: ["-tls=false", "-httptest.serve", ":8989"]
         ports:
         - containerPort: 8989
