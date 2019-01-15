@@ -58,8 +58,13 @@ func main() {
 		}
 	}
 
+	gatewayURL := os.Getenv("OPENFAAS_URL")
+	if val, exists := os.LookupEnv("gateway_url"); exists {
+		gatewayURL = val
+	}
+
 	config := types.ControllerConfig{
-		GatewayURL:      os.Getenv("OPENFAAS_URL"),
+		GatewayURL:      gatewayURL,
 		PrintResponse:   false,
 		RebuildInterval: time.Second * 10,
 		UpstreamTimeout: time.Second * 15,

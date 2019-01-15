@@ -16,10 +16,12 @@ spec:
     spec:
       containers:
       - name: vcenter
-        image: functions/vcenter-connector:0.1.0
+        image: docwareiy/vcenter-connector:0.2.0
         command: ["./connector"]
         args: ["--vcenter-url", "http://user:pass@vcsim.openfaas:8989/sdk", "--insecure"]
         env:
+          - name: gateway_url
+            value: "http://gateway.openfaas:8080"
           - name: topics
             value: "vm.powered.on,"
           - name: basic_auth
