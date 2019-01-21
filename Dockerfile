@@ -22,7 +22,7 @@ WORKDIR /home/app
 
 EXPOSE 8989
 
-COPY --from=builder /go/src/github.com/openfaas-incubator/vcenter-connector/    .
+COPY --from=builder /go/src/github.com/openfaas-incubator/vcenter-connector/connector    .
 
 RUN chown -R app:app ./
 
