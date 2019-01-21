@@ -3,7 +3,6 @@
 To build `vcsim` from latest release, run
 
 ```
-cd vcsim
 docker build -t vscim .
 ```
 
