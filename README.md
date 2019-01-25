@@ -12,6 +12,12 @@ The code is under active development and only suitable for early adopters. More 
 
 ## Example:
 
+### Pre-reqs:
+
+* [OpenFaaS](https://docs.openfaas.com/) running on a local or remote Kubernetes cluster
+* Go installed on your machine (or use the pre-built images, advanced users)
+* An installation of vCenter is optional, the `vcsim` tool can be used instead with `govc` to trigger events
+
 ### How it works:
 
 Functions can subscribe to events in vCenter through the "topic" [annotations](https://docs.openfaas.com/reference/yaml/#function-annotations) applied through your `stack.yml` file.
