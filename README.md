@@ -18,7 +18,7 @@ Functions can subscribe to events in vCenter through the "topic" [annotations](h
 
 I.e. in the following example we will subscribe to the event "vm.powered.on" by adding an annotation to our function of "vm.powered.on"
 
-### Get started with the example
+### Get started with the example (on your local machine)
 
 * Run the vCenter Simulator
 
@@ -81,6 +81,12 @@ kubectl logs -n openfaas-fn deploy/echo-fn
 
 docker service logs echo-fn
 ```
+
+### Get started with the example (on your Kubernetes cluster)
+
+Docker images / Kubernetes YAML files are available in `./yaml/kubernetes/`
+
+These can be used to run a vcsim instance on Kubernetes to simulate a vCenter installation. The connector can also be run this way using its own YAML file.
 
 ## License
 
