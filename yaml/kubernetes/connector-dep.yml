@@ -5,7 +5,6 @@ metadata:
     app: vcenter
     component: vcenter-connector
   name: vcenter-connector
-  namespace: openfaas
 spec:
   replicas: 1
   template:
@@ -16,23 +15,21 @@ spec:
     spec:
       containers:
       - name: vcenter
-        image: docwareiy/vcenter-connector:0.2.0
+        image: embano1/faas-vcconnector:0.2
         command: ["./connector"]
-        args: ["--vcenter-url", "http://user:pass@vcsim.openfaas:8989/sdk", "--insecure"]
-        env:
-          - name: gateway_url
-            value: "http://gateway.openfaas:8080"
-          - name: topics
-            value: "vm.powered.on,"
-          - name: basic_auth
-            value: "true"
-          - name: secret_mount_path
-            value: "/var/secrets/"
-        volumeMounts:
-            - name: auth
-              readOnly: true
-              mountPath: "/var/secrets/"
-      volumes:
-      - name: auth
-        secret:
-          secretName: basic-auth
+        args: ["-vcenter", "https://vcenter.ip", "-vc-user", "vcuser", "-vc-pass", "vcpass", "-insecure", "-gateway", "http://gateway.openfaas:8080"]
+
+      # uncomment and configure accordingly if the OpenFaaS gateway requires authentication
+      #   env:
+      #     - name: basic_auth
+      #       value: "true"
+      #     - name: secret_mount_path
+      #       value: "/var/secrets/"
+      #   volumeMounts:
+      #       - name: auth
+      #         readOnly: true
+      #         mountPath: "/var/secrets/"
+      # volumes:
+      # - name: auth
+      #   secret:
+      #     secretName: basic-auth
