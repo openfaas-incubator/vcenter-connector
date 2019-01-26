@@ -59,14 +59,15 @@ git clone https://github.com/embano1/pytagfn
 cd pytagfn
 ```
 
-4) Configure the Python tagging function `stack.yaml`. The example already has the annotation to subscribe to VM power on events. More details in the [README](https://github.com/embano1/pytagfn/blob/master/README.md).
+4) Configure the Python tagging function `stack.yaml`. The example cloned from Github already has the annotation to subscribe to VM power on events. More details in the [README](https://github.com/embano1/pytagfn/blob/master/README.md).
 
 ```yaml
 environment:
     VC: vcenter.ip                      # must be reachable/resolvable from OpenFaaS
     VCUSERNAME: VCUSER                  # WIP: migration to secrets
-    VCPASSWORD: VCPASS                  # WIP: migration to secrets
-    TAGURN: urn:vmomi:...               # full URN as taken from govc above
+    VCPASSWORD: VCPASSWORD              # WIP: migration to secrets
+    # Replace TAGURN example below with the one you created with govc above
+    TAGURN: urn:vmomi:InventoryServiceTag:019c0a9e-0672-48f5-ac2a-e394669e2916:GLOBAL 
     TAGACTION: attach                   # this function also supports detach
 ```
 
