@@ -34,6 +34,8 @@ Functions can subscribe to events in vCenter through the "topic" [annotations](h
 
 In the following example we will subscribe to the event "vm.powered.on" by adding an annotation to our function of "vm.powered.on". The function will then add a specific tag to any VM when it is powered on.
 
+**Note:** In a DRS-enabled cluster the event is called `drs...` and the example would not work as it's a different event type. If you run this example in a DRS cluster you can use `vm.powered.off` throughout the example below as a workaround.
+
 1) Create a category/tag to be attached to a VM when it is powered on. Since we need the unique tag ID (i.e. vSphere URN) we will use [govc](https://github.com/vmware/govmomi/tree/master/govc) for this job. You can also use vSphere APIs (REST/SOAP) to retrieve the URN.
 
 ```bash
@@ -85,7 +87,7 @@ URL: http://127.0.0.1:8080/function/pytag-fn
 
 6) Download and deploy the OpenFaaS vCenter Connector deployment manifest in a separate
 
-> **Note:** The deployment assumes you have [basic authentication](https://docs.openfaas.com/reference/authentication/#for-the-api-gateway) configured for the OpenFaaS gateway. Thus, the deployment assumes a secret `basic-auth` to be available (`volumes` section in the YAML). If you don't use authentication for the gateway, remove the volumes section as the deployment would fail, not being able to mount the secret to the pod.
+> **Note:** The deployment assumes you have basic authentication configured for OpenFaaS on Kubernetes as per [this guide](https://github.com/openfaas/faas-netes/blob/67f61a468bc73833e53b626fa5243f5d539a9e00/yaml/README.md#L5). Thus, the deployment assumes a secret `gateway-basic-auth` to be available (`volumes` section in the YAML). If you don't use authentication for the gateway, remove the volumes section as the deployment would fail, not being able to mount the secret to the deployment.
 
 ```bash
 git clone https://github.com/openfaas-incubator/vcenter-connector

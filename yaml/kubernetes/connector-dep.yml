@@ -24,11 +24,11 @@ spec:
           - name: secret_mount_path
             value: "/var/secrets/"
         volumeMounts:
-            - name: auth
+            - name: gateway-basic-auth
               readOnly: true
               mountPath: "/var/secrets/"
       # if you do not have authentication enabled for OpenFaaS comment this out 
       volumes:
-      - name: auth
+      - name: gateway-basic-auth
         secret:
-          secretName: basic-auth
+          secretName: gateway-basic-auth
