@@ -17,7 +17,7 @@ The code is under **active development** and only suitable for early adopters. F
 ### Pre-reqs:
 
 * [OpenFaaS](https://docs.openfaas.com/) running on a local or remote Kubernetes cluster (e.g. [kind](https://blog.alexellis.io/get-started-with-openfaas-and-kind/))
-* An installation of vCenter (tested against 6.5)
+* An installation of vCenter (tested against 6.5) or the vCenter simulator [vcsim](https://github.com/vmware/govmomi/tree/master/vcsim)
 * A vCenter user/service account with sufficient rights to perform the (tagging) action of the example function
 * `docker` to run tools like `govc` if not installed on your machine already
 * `git` to clone the function example
@@ -67,17 +67,19 @@ cd pytagfn
 
 ```yaml
 environment:
-    VC: vcenter.ip                      # FQDN/IP, must be reachable/resolvable from OpenFaaS
+    # FQDN/IP<:PORT>, must be reachable/resolvable from OpenFaaS. If port is != 443 please specify (e.g. "vcsim.openfaas:8989")
+    VC: vcenter.ip                      
     VC_USERNAME: VCUSER                  # WIP: migration to secrets
     VC_PASSWORD: VCPASSWORD              # WIP: migration to secrets
     # Replace TAG_URN example below with the one you created with govc above
     TAG_URN: urn:vmomi:InventoryServiceTag:019c0a9e-0672-48f5-ac2a-e394669e2916:GLOBAL 
-    TAG_ACTION: attach                   # this function also supports detach
+    TAG_ACTION: attach                   # this Python function also supports detach
 ```
 
 5) Deploy the function
 
 ```bash
+faas-cli template pull
 faas-cli deploy
 Deploying: pytag-fn.
 
@@ -87,14 +89,14 @@ URL: http://127.0.0.1:8080/function/pytag-fn
 
 6) Download and deploy the OpenFaaS vCenter Connector deployment manifest in a separate
 
-> **Note:** The deployment assumes you have basic authentication configured for OpenFaaS on Kubernetes as per [this guide](https://github.com/openfaas/faas-netes/blob/67f61a468bc73833e53b626fa5243f5d539a9e00/yaml/README.md#L5). Thus, the deployment assumes a secret `gateway-basic-auth` to be available (`volumes` section in the YAML). If you don't use authentication for the gateway, remove the volumes section as the deployment would fail, not being able to mount the secret to the deployment.
+> **Note:** The deployment assumes you have basic authentication configured for OpenFaaS on Kubernetes as per [this guide](https://github.com/openfaas/faas-netes/blob/67f61a468bc73833e53b626fa5243f5d539a9e00/yaml/README.md#L5). Thus, the deployment assumes a secret `gateway-basic-auth` to be available (`volumes` section in the YAML). If you don't use authentication for the gateway, please edit the file (`yaml/kubernetes/connector-dep.yml`) as per instructions in the file.
 
 ```bash
 git clone https://github.com/openfaas-incubator/vcenter-connector
 cd vcenter-connector
 
-# In yaml/kubernetes/connector-dep.yml modify the container args "-vcenter" (following URL scheme), "-vc-user" and "-vc-pass" accordingly
-# Note: If you are not running your vCenter connector in the same cluster as OpenFaaS edit the -gateway flag
+# In yaml/kubernetes/connector-dep.yml modify the container args "-vcenter" (incl. protocol, i.e. "https://"), "-vc-user" and "-vc-pass" accordingly. If vCenter port != 443, please specify (e.g. "https://vcsim.openfaas:8989").
+# Note: If you are not running your vCenter connector in the same cluster as OpenFaaS edit the "-gateway" flag where the OpenFaaS gateway can be reached.
 
 # Deploy the connector to Kubernetes
 kubectl -n openfaas create -f yaml/kubernetes/connector-dep.yml
