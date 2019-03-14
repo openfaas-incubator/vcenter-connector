@@ -3,6 +3,7 @@ RUN mkdir -p /go/src/github.com/openfaas-incubator/vcenter-connector
 WORKDIR /go/src/github.com/openfaas-incubator/vcenter-connector
 
 COPY vendor     vendor
+COPY pkg        pkg
 COPY main.go    .
 
 # Run a gofmt and exclude all vendored code.

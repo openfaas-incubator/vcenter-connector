@@ -59,8 +59,6 @@ func invokefunction(c *http.Client, gwURL string, reader io.Reader) (*[]byte, in
 		defer httpReq.Body.Close()
 	}
 
-	httpReq.Header.Set("Content-Type", "plain/text")
-
 	var body *[]byte
 
 	res, doErr := c.Do(httpReq)
