@@ -22,12 +22,14 @@ import (
 // OutboundEvent is the JSON object sent to subscribed functions
 // If the ManagedObjectReference for an event cannot be retrieved, it will be nil and thus not marshaled into the JSON OutboundEvent
 // It's the receivers responsibility to check whether managedObjectReference key is present in the JSON message payload
+// ObjectName is the name of the object as it appears in vCenter - uniqueness is only guaranteed at the folder level, if applicable, where this object resides
 type OutboundEvent struct {
 	Topic    string `json:"topic,omitempty"`
 	Category string `json:"category,omitempty"`
 
 	UserName               string                         `json:"userName,omitempty"`
 	CreatedTime            time.Time                      `json:"createdTime,omitempty"`
+	ObjectName             string                         `json:"objectName,omitempty"`
 	ManagedObjectReference *vtypes.ManagedObjectReference `json:"managedObjectReference,omitempty"`
 }
 
@@ -103,13 +105,14 @@ func handleEvent(event vtypes.BaseEvent, m *event.Manager) (string, string, erro
 
 	// Get the ManagedObjectReference by converting the event into a concrete event
 	// If we don't find a MoRef in the event, *ref will be nil and not marshaled in the OutboundEvent making it easy for the subscribed function to validate the JSON payload
-	ref := getMoref(event)
+	name, ref := getObjectNameAndMoref(event)
 
 	message, err := json.Marshal(OutboundEvent{
 		Topic:                  topic,
 		Category:               category,
 		UserName:               user,
 		CreatedTime:            createdTime,
+		ObjectName:             name,
 		ManagedObjectReference: ref,
 	})
 	if err != nil {
@@ -123,10 +126,11 @@ func handleEvent(event vtypes.BaseEvent, m *event.Manager) (string, string, erro
 // getMoref extracts the ManagedObjectReference, if any, by converting the BaseEvent to a concrete event
 // Details on the ManagedObjectReference:
 // https://code.vmware.com/docs/7371/vmware-vsphere-web-services-sdk-programming-guide-6-7-update-1#/doc/GUID-C9E81F17-2516-49EE-914F-EE9904258ED3.html
-func getMoref(event vtypes.BaseEvent) *vtypes.ManagedObjectReference {
+func getObjectNameAndMoref(event vtypes.BaseEvent) (string, *vtypes.ManagedObjectReference) {
 	// This pointer to the ManagedObjectReference will be used during the BaseEvent switch below
 	// If we don't find a MoRef in the event, *ref will be nil and not marshaled in the OutboundEvent
 	var ref *vtypes.ManagedObjectReference
+	var objName string
 
 	// Get the underlying concrete base event, e.g. VmEvent
 	// vSphere Web Service API Reference 6.7
@@ -135,30 +139,35 @@ func getMoref(event vtypes.BaseEvent) *vtypes.ManagedObjectReference {
 	// Alerts
 	case vtypes.BaseAlarmEvent:
 		e := baseEvent.GetAlarmEvent()
+		objName = e.Alarm.Name
 		ref = &e.Alarm.Alarm
 
 	// Datastore
 	case vtypes.BaseDatastoreEvent:
 		e := baseEvent.GetDatastoreEvent()
+		objName = e.Datastore.Name
 		ref = &e.Datastore.Datastore
 
 	// Host/ESX
 	case vtypes.BaseHostEvent:
 		e := baseEvent.GetHostEvent()
+		objName = e.Host.Name
 		ref = &e.Host.Host
 
 	// Resource Pool
 	case vtypes.BaseResourcePoolEvent:
 		e := baseEvent.GetResourcePoolEvent()
+		objName = e.ResourcePool.Name
 		ref = &e.ResourcePool.ResourcePool
 
 	// VM
 	case vtypes.BaseVmEvent:
 		e := baseEvent.GetVmEvent()
+		objName = e.Vm.Name
 		ref = &e.Vm.Vm
 	}
 
-	return ref
+	return objName, ref
 }
 
 // convertToTopic converts an event type to an OpenFaaS subscriber topic, e.g. "VmPoweredOnEvent" to "vm.powered.on"
