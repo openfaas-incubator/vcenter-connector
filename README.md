@@ -24,7 +24,7 @@ For further details and naming see the [vSphere Web Services API](https://code.v
 
 ## Example
 
-You can find a detailed example using vSphere tags for `VmPoweredOnEvent` [here](docs/example.md).
+You can find a detailed example using vSphere tags for `VmPoweredOnEvent` [here](docs/example.md). You might also want to check out Robert Guske's [blog](https://rguske.github.io/post/event-driven-interactions-with-vsphere-using-functions-as-a-service/) post on how he automated the integration between several VMware products with OpenFaaS and this vcenter-connector.
 
 ## License
 
