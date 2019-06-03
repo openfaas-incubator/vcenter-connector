@@ -24,6 +24,7 @@ import (
 // It's the receivers responsibility to check whether managedObjectReference key is present in the JSON message payload
 // ObjectName is the name of the object as it appears in vCenter - uniqueness is only guaranteed at the folder level, if applicable, where this object resides
 type OutboundEvent struct {
+	Source   string `json:"source"`
 	Topic    string `json:"topic,omitempty"`
 	Category string `json:"category,omitempty"`
 
@@ -55,7 +56,9 @@ func Stream(ctx context.Context, c *vim25.Client, controller *types.Controller) 
 	tail := true
 	force := true
 
-	recv := makeRecv(controller, m)
+	// get vCenter source to send to reciever
+	source := c.URL().Host
+	recv := makeRecv(controller, m, source)
 	err := m.Events(ctx, managedTypes, eventsPerPage, tail, force, recv)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to event-stream")
@@ -64,14 +67,14 @@ func Stream(ctx context.Context, c *vim25.Client, controller *types.Controller) 
 }
 
 // makeRecv returns a event handler function called by the event manager on each event
-func makeRecv(controller *types.Controller, m *event.Manager) func(managedObjectReference vtypes.ManagedObjectReference, baseEvent []vtypes.BaseEvent) error {
+func makeRecv(controller *types.Controller, m *event.Manager, source string) func(managedObjectReference vtypes.ManagedObjectReference, baseEvent []vtypes.BaseEvent) error {
 	return func(managedObjectReference vtypes.ManagedObjectReference, baseEvent []vtypes.BaseEvent) error {
 		log.Printf("Object %v", managedObjectReference)
 
 		for i, event := range baseEvent {
 			log.Printf("Event [%d] %v", i, event)
 
-			topic, message, err := handleEvent(event, m)
+			topic, message, err := handleEvent(event, m, source)
 			if err != nil {
 				log.Printf("error handling event: %s", err.Error())
 				continue
@@ -85,7 +88,7 @@ func makeRecv(controller *types.Controller, m *event.Manager) func(managedObject
 	}
 }
 
-func handleEvent(event vtypes.BaseEvent, m *event.Manager) (string, string, error) {
+func handleEvent(event vtypes.BaseEvent, m *event.Manager, source string) (string, string, error) {
 	// Sanity check to avoid nil pointer exception
 	if event == nil {
 		return "", "", errors.New("event must not be nil")
@@ -108,6 +111,7 @@ func handleEvent(event vtypes.BaseEvent, m *event.Manager) (string, string, erro
 	name, ref := getObjectNameAndMoref(event)
 
 	message, err := json.Marshal(OutboundEvent{
+		Source:                 source,
 		Topic:                  topic,
 		Category:               category,
 		UserName:               user,
