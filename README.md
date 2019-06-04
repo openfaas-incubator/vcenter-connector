@@ -26,6 +26,30 @@ The following event types (incl. their subtypes) are supported and can be used t
 
 For further details and naming see the [vSphere Web Services API](https://code.vmware.com/apis/358/vsphere#/doc/vim.event.Event.html) documentation.
 
+## Other configuration
+
+### Credentials
+
+You can pass credentials via arguments (not recommended).
+
+Or use a secret and pass the name:
+
+```sh
+./vcenter-connector \
+  -vc-user-secret-name=vcenter1-username \
+  -vc-password-secret-name=vcenter1-password
+```
+
+Use `kubectl` to create the secrets you need ahead of time in the namespace where you deploy the connector.
+
+```sh
+kubectl create secret generic vcenter-secrets \
+  --from-literal vcenter1-username=admin \
+  --from-literal vcenter1-password=test1234
+```
+
+Now mount your secret at `/var/openfaas/secrets/` in your Kubernetes Deployment YAML file.
+
 ## Example
 
 You can find a detailed example using vSphere tags for `VmPoweredOnEvent` [here](docs/example.md). You might also want to check out Robert Guske's [blog](https://rguske.github.io/post/event-driven-interactions-with-vsphere-using-functions-as-a-service/) post on how he automated the integration between several VMware products with OpenFaaS and this vcenter-connector.

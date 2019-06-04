@@ -13,6 +13,7 @@ import (
 
 	"github.com/openfaas-incubator/connector-sdk/types"
 	"github.com/openfaas/faas-provider/auth"
+	"github.com/openfaas/openfaas-cloud/sdk"
 )
 
 func main() {
@@ -20,6 +21,9 @@ func main() {
 	var vcenterURL string
 	var vcUser string
 	var vcPass string
+	var vcUserSecret string
+	var vcPasswordSecret string
+
 	var insecure bool
 
 	// TODO: add secrets management, verbosity level
@@ -27,11 +31,31 @@ func main() {
 	flag.StringVar(&vcenterURL, "vcenter", "http://127.0.0.1:8989/sdk", "URL for vCenter")
 	flag.StringVar(&vcUser, "vc-user", "", "User to connect to vCenter")
 	flag.StringVar(&vcPass, "vc-pass", "", "Password to connect to vCenter")
+
+	flag.StringVar(&vcUserSecret, "vc-user-secret-name", "", "Secret file to use for username")
+	flag.StringVar(&vcPasswordSecret, "vc-pass-secret-name", "", "Secret file to use for password")
+
 	flag.BoolVar(&insecure, "insecure", false, "use an insecure connection to vCenter (default false)")
 	flag.Parse()
 
 	if len(vcenterURL) == 0 {
 		log.Fatal("vcenterURL not provided")
+	}
+
+	if len(vcUserSecret) > 0 {
+		val, err := sdk.ReadSecret("vc-secret-user")
+		if err != nil {
+			panic(err.Error())
+		}
+		vcUser = val
+	}
+
+	if len(vcPasswordSecret) > 0 {
+		val, err := sdk.ReadSecret("vc-secret-pass")
+		if err != nil {
+			panic(err.Error())
+		}
+		vcPass = val
 	}
 
 	vcenterClient, err := events.NewVCenterClient(context.Background(), vcUser, vcPass, vcenterURL, insecure)
