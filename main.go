@@ -43,7 +43,7 @@ func main() {
 	}
 
 	if len(vcUserSecret) > 0 {
-		val, err := sdk.ReadSecret("vc-secret-user")
+		val, err := sdk.ReadSecret(vcUserSecret)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -51,7 +51,7 @@ func main() {
 	}
 
 	if len(vcPasswordSecret) > 0 {
-		val, err := sdk.ReadSecret("vc-secret-pass")
+		val, err := sdk.ReadSecret(vcPasswordSecret)
 		if err != nil {
 			panic(err.Error())
 		}
