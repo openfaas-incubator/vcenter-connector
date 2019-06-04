@@ -32,10 +32,18 @@ For further details and naming see the [vSphere Web Services API](https://code.v
 
 You can pass credentials via arguments (not recommended).
 
+```sh
+./vcenter-connector \
+  -vc-user="admin" \
+  -vc-pass="test1234" \
+```
+
 Or use a secret and pass the name:
 
 ```sh
 ./vcenter-connector \
+  -vc-user="" \
+  -vc-pass="" \
   -vc-user-secret-name=vcenter1-username \
   -vc-password-secret-name=vcenter1-password
 ```
