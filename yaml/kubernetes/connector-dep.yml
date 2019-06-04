@@ -18,7 +18,7 @@ spec:
       - name: vcenter
         image: openfaas/vcenter-connector:0.2.2-rc2
         command: ["./connector"]
-        args: ["-vcenter", "https://vcsim-server:8989", "-vc-user-secret-name", "vcenter-username", "-vc-pass-secret-name", "vcenter-password", "-insecure", "-gateway", "http://gateway.openfaas:8080"]
+        args: ["-vcenter", "http://vcsim.openfaas:8989", "-vc-user-secret-name", "vcenter-username", "-vc-pass-secret-name", "vcenter-password", "-insecure", "-gateway", "http://gateway.openfaas:8080"]
         # To remove auth, remove the volumes and mounts.
         env:
           - name: basic_auth

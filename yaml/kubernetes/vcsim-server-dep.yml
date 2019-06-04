@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: vcsim
-        image: docwareiy/vcsim:0.1.0-r
+        image: embano1/vcsim:e560c7b
         command: ["./vcsim"]
         args: ["-tls=false", "-httptest.serve", ":8989"]
         ports:
