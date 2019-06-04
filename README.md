@@ -44,16 +44,17 @@ Or use a secret and pass the name:
 ./vcenter-connector \
   -vc-user="" \
   -vc-pass="" \
-  -vc-user-secret-name=vcenter1-username \
-  -vc-password-secret-name=vcenter1-password
+  -vc-user-secret-name=vcenter-username \
+  -vc-password-secret-name=vcenter-password
 ```
 
 Use `kubectl` to create the secrets you need ahead of time in the namespace where you deploy the connector.
 
 ```sh
 kubectl create secret generic vcenter-secrets \
-  --from-literal vcenter1-username=admin \
-  --from-literal vcenter1-password=test1234
+  -n openfaas \
+  --from-literal vcenter-username=user \
+  --from-literal vcenter-password=pass
 ```
 
 Now mount your secret at `/var/openfaas/secrets/` in your Kubernetes Deployment YAML file.

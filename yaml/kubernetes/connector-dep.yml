@@ -1,10 +1,11 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: vcenter-connector
+  namespace: openfaas
   labels:
     app: vcenter
     component: vcenter-connector
-  name: vcenter-connector
 spec:
   replicas: 1
   template:
@@ -15,20 +16,35 @@ spec:
     spec:
       containers:
       - name: vcenter
-        image: embano1/faas-vcconnector:0.4
+        image: openfaas/vcenter-connector:0.2.2-rc2
         command: ["./connector"]
-        args: ["-vcenter", "https://vcenter.ip", "-vc-user", "vcuser", "-vc-pass", "vcpass", "-insecure", "-gateway", "http://gateway.openfaas:8080"]
-      # if you do not have authentication enabled for OpenFaaS comment everything below out (incl. volumes)
+        args: ["-vcenter", "https://vcsim-server:8989", "-vc-user-secret-name", "vcenter-username", "-vc-pass-secret-name", "vcenter-password", "-insecure", "-gateway", "http://gateway.openfaas:8080"]
+        # To remove auth, remove the volumes and mounts.
         env:
           - name: basic_auth
             value: "true"
           - name: secret_mount_path
             value: "/var/secrets/"
         volumeMounts:
-            - name: gateway-basic-auth
+            - name: auth-secrets-projected
               readOnly: true
               mountPath: "/var/secrets/"
       volumes:
-      - name: gateway-basic-auth
-        secret:
-          secretName: gateway-basic-auth
+      - name: auth-secrets-projected
+        projected:
+            defaultMode: 420
+            sources:
+            - secret:
+                items:
+                  - key: basic-auth-user
+                    path: basic-auth-user
+                  - key: basic-auth-password
+                    path: basic-auth-password
+                name: basic-auth
+            - secret:
+                items:
+                  - key: vcenter-username
+                    path: vcenter-username
+                  - key: vcenter-password
+                    path: vcenter-password
+                name: vcenter-secrets
