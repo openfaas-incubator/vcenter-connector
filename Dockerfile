@@ -1,4 +1,6 @@
-FROM golang:1.10.4 as builder
+FROM golang:1.11 as builder
+ENV CGO_ENABLED=0
+
 RUN mkdir -p /go/src/github.com/openfaas-incubator/vcenter-connector
 WORKDIR /go/src/github.com/openfaas-incubator/vcenter-connector
 
@@ -14,7 +16,7 @@ RUN go test -v ./...
 # Stripping via -ldflags "-s -w" 
 RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags "-s -w" -installsuffix cgo -o ./connector
 
-FROM alpine:3.8
+FROM alpine:3.10 as ship
 
 RUN addgroup -S app \
     && adduser -S -g app app
