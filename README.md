@@ -26,9 +26,22 @@ The following event types (incl. their subtypes) are supported and can be used t
 
 For further details and naming see the [vSphere Web Services API](https://code.vmware.com/apis/358/vsphere#/doc/vim.event.Event.html) documentation.
 
-## Other configuration
+## Credentials
 
-### Credentials
+### Credentials within Kubernetes
+
+When using the connector in Kubernetes, you will need to create a secret for the connector in the `openfaas` namespace.
+
+```sh
+kubectl create secret generic vcenter-secrets \
+  -n openfaas \
+  --from-literal vcenter-username=user \
+  --from-literal vcenter-password=pass
+```
+
+At runtime these secrets will be mounted at `/var/openfaas/secrets/`. See [/yaml/kubernetes/connector-dep.yml](/yaml/kubernetes/connector-dep.yml) for more.
+
+### Using credentials outside of Kubernetes
 
 You can pass credentials via arguments (not recommended).
 
@@ -38,9 +51,11 @@ You can pass credentials via arguments (not recommended).
   -vc-pass="test1234" \
 ```
 
-Or use a secret and pass the name:
+Or use a file and pass the name:
 
 ```sh
+export secret_mount_path="/tmp/secrets/`
+
 ./vcenter-connector \
   -vc-user="" \
   -vc-pass="" \
@@ -48,16 +63,7 @@ Or use a secret and pass the name:
   -vc-password-secret-name=vcenter-password
 ```
 
-Use `kubectl` to create the secrets you need ahead of time in the namespace where you deploy the connector.
-
-```sh
-kubectl create secret generic vcenter-secrets \
-  -n openfaas \
-  --from-literal vcenter-username=user \
-  --from-literal vcenter-password=pass
-```
-
-Now mount your secret at `/var/openfaas/secrets/` in your Kubernetes Deployment YAML file.
+The default path is `/var/openfaas/secrets/` which can be overridden by setting the `secret_mount_path` environment variable.
 
 ## Example
 
@@ -69,8 +75,12 @@ MIT
 
 ## Acknowledgements
 
-Thanks to VMware's Doug MacEachern for the awesome [govmomi](https://github.com/vmware/govmomi) project providing Golang bindings for vCenter and the [vcsim simulator tool](https://github.com/vmware/govmomi/blob/master/vcsim/README.md).
+This project is hosted and maintained by [OpenFaaS Ltd](https://www.openfaas.com/)
 
-Thanks to Karol Stępniewski for showing me a demo of events being consumed in OpenFaaS via vCenter over a year ago at KubeCon in Austin. Parts of his "event-driver" originally developed in the Dispatch project have been adapted for this OpenFaaS event-connector including a method to convert camel case event names into names separated by a dot. I wanted to include this for compatibility between the two systems.
+It makes use of the following components:
 
-Other acknowledgements: Michael Gasch (VMware) and Ivana Yocheva (VMware).
+* [govmomi](https://github.com/vmware/govmomi) project providing Golang bindings for vCenter by Doug MacEachern, VMware
+* [vcsim](https://github.com/vmware/govmomi/blob/master/vcsim/README.md) simulator tool by Doug MacEachern, VMware
+
+The contact for VMware is [Michael Gasch (VMware)](https://github.com/embano1)
+The contact for OpenFaaS Ltd is [Alex Ellis](https://github.com/alexellis)

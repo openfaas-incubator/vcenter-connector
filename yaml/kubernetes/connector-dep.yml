@@ -24,11 +24,11 @@ spec:
           - name: basic_auth
             value: "true"
           - name: secret_mount_path
-            value: "/var/secrets/"
+            value: "/var/openfaas/secrets/"
         volumeMounts:
             - name: auth-secrets-projected
               readOnly: true
-              mountPath: "/var/secrets/"
+              mountPath: "/var/openfaas/secrets/"
       volumes:
       - name: auth-secrets-projected
         projected:
