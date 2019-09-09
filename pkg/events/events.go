@@ -26,6 +26,7 @@ import (
 type OutboundEvent struct {
 	Topic    string `json:"topic,omitempty"`
 	Category string `json:"category,omitempty"`
+	Source   string `json:"source"`
 
 	UserName               string                         `json:"userName,omitempty"`
 	CreatedTime            time.Time                      `json:"createdTime,omitempty"`
@@ -54,8 +55,10 @@ func Stream(ctx context.Context, c *vim25.Client, controller *types.Controller) 
 	eventsPerPage := int32(1)
 	tail := true
 	force := true
+	source := c.URL().Host
 
-	recv := makeRecv(controller, m)
+	recv := makeRecv(controller, m, source)
+
 	err := m.Events(ctx, managedTypes, eventsPerPage, tail, force, recv)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to event-stream")
@@ -64,14 +67,14 @@ func Stream(ctx context.Context, c *vim25.Client, controller *types.Controller) 
 }
 
 // makeRecv returns a event handler function called by the event manager on each event
-func makeRecv(controller *types.Controller, m *event.Manager) func(managedObjectReference vtypes.ManagedObjectReference, baseEvent []vtypes.BaseEvent) error {
+func makeRecv(controller *types.Controller, m *event.Manager, source string) func(managedObjectReference vtypes.ManagedObjectReference, baseEvent []vtypes.BaseEvent) error {
 	return func(managedObjectReference vtypes.ManagedObjectReference, baseEvent []vtypes.BaseEvent) error {
 		log.Printf("Object %v", managedObjectReference)
 
 		for i, event := range baseEvent {
 			log.Printf("Event [%d] %v", i, event)
 
-			topic, message, err := handleEvent(event, m)
+			topic, message, err := handleEvent(event, m, source)
 			if err != nil {
 				log.Printf("error handling event: %s", err.Error())
 				continue
@@ -85,7 +88,7 @@ func makeRecv(controller *types.Controller, m *event.Manager) func(managedObject
 	}
 }
 
-func handleEvent(event vtypes.BaseEvent, m *event.Manager) (string, string, error) {
+func handleEvent(event vtypes.BaseEvent, m *event.Manager, source string) (string, string, error) {
 	// Sanity check to avoid nil pointer exception
 	if event == nil {
 		return "", "", errors.New("event must not be nil")
@@ -114,6 +117,7 @@ func handleEvent(event vtypes.BaseEvent, m *event.Manager) (string, string, erro
 		CreatedTime:            createdTime,
 		ObjectName:             name,
 		ManagedObjectReference: ref,
+		Source:                 source,
 	})
 	if err != nil {
 		return "", "", errors.Wrap(err, "error marshaling outboundevent")
