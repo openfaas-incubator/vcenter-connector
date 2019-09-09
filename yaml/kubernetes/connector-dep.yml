@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: vcenter
-        image: openfaas/vcenter-connector:0.3.0-rc1
+        image: openfaas/vcenter-connector:0.4.0
         command: ["./connector"]
         args: ["-vcenter", "http://vcsim.openfaas:8989", "-vc-user-secret-name", "vcenter-username", "-vc-pass-secret-name", "vcenter-password", "-insecure", "-gateway", "http://gateway.openfaas:8080"]
         # To remove basic-authentication, remove the volumes and mounts from this file
