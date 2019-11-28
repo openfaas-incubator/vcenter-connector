@@ -10,7 +10,7 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/openfaas-incubator/connector-sdk/types"
+	ofsdk "github.com/openfaas-incubator/connector-sdk/types"
 	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/event"
@@ -19,10 +19,13 @@ import (
 	vtypes "github.com/vmware/govmomi/vim25/types"
 )
 
-// OutboundEvent is the JSON object sent to subscribed functions
-// If the ManagedObjectReference for an event cannot be retrieved, it will be nil and thus not marshaled into the JSON OutboundEvent
-// It's the receivers responsibility to check whether managedObjectReference key is present in the JSON message payload
-// ObjectName is the name of the object as it appears in vCenter - uniqueness is only guaranteed at the folder level, if applicable, where this object resides
+// OutboundEvent is the JSON object sent to subscribed functions If the
+// ManagedObjectReference for an event cannot be retrieved, it will be nil and
+// thus not marshaled into the JSON OutboundEvent It's the receivers
+// responsibility to check whether managedObjectReference key is present in the
+// JSON message payload ObjectName is the name of the object as it appears in
+// vCenter - uniqueness is only guaranteed at the folder level, if applicable,
+// where this object resides
 type OutboundEvent struct {
 	Topic    string `json:"topic,omitempty"`
 	Category string `json:"category,omitempty"`
@@ -32,6 +35,25 @@ type OutboundEvent struct {
 	CreatedTime            time.Time                      `json:"createdTime,omitempty"`
 	ObjectName             string                         `json:"objectName,omitempty"`
 	ManagedObjectReference *vtypes.ManagedObjectReference `json:"managedObjectReference,omitempty"`
+}
+
+// EventReceiver implements ResponseSubscriber to validate function invocation
+// and return status
+type EventReceiver struct{}
+
+// Response prints status information for each function invokation
+func (e *EventReceiver) Response(res ofsdk.InvokerResponse) {
+	if res.Error != nil {
+		log.Printf("function %s for topic %s returned status %d with error: %v", res.Function, res.Topic, res.Status, res.Error)
+	}
+	log.Printf("successfully invoked function %s for topic %s", res.Function, res.Topic)
+}
+
+// NewEventReceiver returns an EventReceiver which implements the
+// ResponseSubscriber interface to print status information for each function
+// invokation
+func NewEventReceiver() *EventReceiver {
+	return &EventReceiver{}
 }
 
 // NewVCenterClient returns a govmomi.Client to connect to vCenter
@@ -46,7 +68,7 @@ func NewVCenterClient(ctx context.Context, user string, pass string, vcenterURL 
 }
 
 // Stream is the main logic, blocking to receive and handle events from vCenter
-func Stream(ctx context.Context, c *vim25.Client, controller *types.Controller) error {
+func Stream(ctx context.Context, c *vim25.Client, controller ofsdk.Controller) error {
 	// create event manager to consume events from vCenter
 	m := event.NewManager(c)
 
@@ -66,8 +88,9 @@ func Stream(ctx context.Context, c *vim25.Client, controller *types.Controller) 
 	return nil
 }
 
-// makeRecv returns a event handler function called by the event manager on each event
-func makeRecv(controller *types.Controller, m *event.Manager, source string) func(managedObjectReference vtypes.ManagedObjectReference, baseEvent []vtypes.BaseEvent) error {
+// makeRecv returns a event handler function called by the event manager on each
+// event
+func makeRecv(controller ofsdk.Controller, m *event.Manager, source string) func(managedObjectReference vtypes.ManagedObjectReference, baseEvent []vtypes.BaseEvent) error {
 	return func(managedObjectReference vtypes.ManagedObjectReference, baseEvent []vtypes.BaseEvent) error {
 		log.Printf("Object %v", managedObjectReference)
 
@@ -174,14 +197,16 @@ func getObjectNameAndMoref(event vtypes.BaseEvent) (string, *vtypes.ManagedObjec
 	return objName, ref
 }
 
-// convertToTopic converts an event type to an OpenFaaS subscriber topic, e.g. "VmPoweredOnEvent" to "vm.powered.on"
+// convertToTopic converts an event type to an OpenFaaS subscriber topic, e.g.
+// "VmPoweredOnEvent" to "vm.powered.on"
 func convertToTopic(eventType string) string {
 	eventType = strings.Replace(eventType, "Event", "", -1)
 	return camelCaseToLowerSeparated(eventType, ".")
 }
 
 // From https://github.com/vmware/dispatch/blob/master/pkg/utils/str_convert.go
-// camelCaseToLowerSeparated converts a camel cased string to a multi-word string delimited by the specified separator
+// camelCaseToLowerSeparated converts a camel cased string to a multi-word
+// string delimited by the specified separator
 func camelCaseToLowerSeparated(src string, sep string) string {
 	var words []string
 	var word []rune

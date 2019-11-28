@@ -157,7 +157,7 @@ func (t *typeInfo) build(typ reflect.Type, fn string, fi []int) {
 
 var nilValue reflect.Value
 
-// assignValue assignes a value 'pv' to the struct pointed to by 'val', given a
+// assignValue assigns a value 'pv' to the struct pointed to by 'val', given a
 // slice of field indices. It recurses into the struct until it finds the field
 // specified by the indices. It creates new values for pointer types where
 // needed.
@@ -218,6 +218,9 @@ func assignValue(val reflect.Value, fi []int, pv reflect.Value) {
 			} else {
 				panic(fmt.Sprintf("type %s doesn't implement %s", pt.Name(), rt.Name()))
 			}
+		} else if rt.Kind() == reflect.Struct && pt.Kind() == reflect.Ptr {
+			pv = pv.Elem()
+			pt = pv.Type()
 		}
 
 		if pt.AssignableTo(rt) {

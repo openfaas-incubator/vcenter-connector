@@ -11,9 +11,13 @@ import (
 
 	"github.com/openfaas-incubator/vcenter-connector/pkg/events"
 
-	"github.com/openfaas-incubator/connector-sdk/types"
+	ofsdk "github.com/openfaas-incubator/connector-sdk/types"
 	"github.com/openfaas/faas-provider/auth"
 	"github.com/openfaas/openfaas-cloud/sdk"
+)
+
+const (
+	topicDelimiter = ","
 )
 
 func main() {
@@ -26,7 +30,7 @@ func main() {
 
 	var insecure bool
 
-	// TODO: add secrets management, verbosity level
+	// TODO: add option to configure log verbosity
 	flag.StringVar(&gatewayURL, "gateway", "http://127.0.0.1:8080", "URL for OpenFaaS gateway")
 	flag.StringVar(&vcenterURL, "vcenter", "http://127.0.0.1:8989/sdk", "URL for vCenter")
 	flag.StringVar(&vcUser, "vc-user", "", "User to connect to vCenter")
@@ -83,15 +87,18 @@ func main() {
 	}
 
 	// OpenFaaS connector SDK controller configuration
-	ofconfig := types.ControllerConfig{
-		GatewayURL:      gatewayURL,
-		PrintResponse:   false,
-		RebuildInterval: time.Second * 10,
-		UpstreamTimeout: time.Second * 15,
+	ofconfig := ofsdk.ControllerConfig{
+		GatewayURL:               gatewayURL,
+		TopicAnnotationDelimiter: topicDelimiter,
+		RebuildInterval:          time.Second * 10,
+		UpstreamTimeout:          time.Second * 15,
+		AsyncFunctionInvocation:  true, // don't block when invoking long-running/heavy functions, higher throughput
+		PrintSync:                true,
 	}
 
-	// get OpenFaaS connector controller
-	ofcontroller := types.NewController(credentials, &ofconfig)
+	ofcontroller := ofsdk.NewController(credentials, &ofconfig)
+	responseHandler := events.NewEventReceiver()
+	ofcontroller.Subscribe(responseHandler)
 	ofcontroller.BeginMapBuilder()
 
 	ctx, cancel := context.WithCancel(context.Background())
