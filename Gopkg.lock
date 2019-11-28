@@ -10,36 +10,31 @@
   version = "1.2"
 
 [[projects]]
-  digest = "1:2a7750103f5ea9a84634dbb554672ce8b11c762281ec1318038cbec14a470241"
+  digest = "1:f74e36b9c7f0fcf4d73483a71d873672ebc8a309c57c273af7e11f6f4e32654e"
   name = "github.com/openfaas-incubator/connector-sdk"
   packages = ["types"]
   pruneopts = "UT"
-  revision = "2db120a2ec4b544bae7ee306975b70c1dc9adcf4"
-  version = "0.2.0"
+  revision = "193b73292e32864286853efeccbc5190b5d3c84d"
+  version = "0.5.3"
 
 [[projects]]
-  digest = "1:3f69624cb4ae8ab815a672f7d169d64786ee027a9d42eefab3c9d4e9debe0750"
-  name = "github.com/openfaas/faas"
-  packages = ["gateway/requests"]
-  pruneopts = "UT"
-  revision = "a65df4795bc66147c41161c48bfd4c72f60c7434"
-  version = "0.9.14"
-
-[[projects]]
-  digest = "1:deb76da5396c9f641ddea9ca79e31a14bdb09c787cdfda90488768b7539b1fd6"
+  digest = "1:5ef12e7154e453638378dfc853ca53d2d775aee2d7a6da535df639d5933b39c7"
   name = "github.com/openfaas/faas-provider"
-  packages = ["auth"]
+  packages = [
+    "auth",
+    "types",
+  ]
   pruneopts = "UT"
-  revision = "220324e98f5db5aa61f02d1ab13f03e91310796c"
-  version = "0.8.1"
+  revision = "7677057e416ba796df41f9f366956a491c5684ff"
+  version = "0.13.2"
 
 [[projects]]
-  digest = "1:bfeeed88d0e6fd0c674b2bf0db4f6da90eecac5e7f6f32d2afec1ddaef6cb6d3"
+  digest = "1:4bdd284c46a1a79c5d1bdcb445c3c3e181a6687888afab1ae61b0486a9c6b177"
   name = "github.com/openfaas/openfaas-cloud"
   packages = ["sdk"]
   pruneopts = "UT"
-  revision = "3b168d133a0d9d1bdf46bee98bac2f2a4a28472f"
-  version = "0.9.6"
+  revision = "22c4c0231e63568a9e4e776623af7bf18bad0a07"
+  version = "0.11.10"
 
 [[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
@@ -50,7 +45,7 @@
   version = "v0.8.1"
 
 [[projects]]
-  digest = "1:d7e0b7f7e85e3d2d3db0e3816895f6dc9f95d7e7dbcbe14970abc128a905fa03"
+  digest = "1:ecff14a61b84c256ec584fe7001e524d7e432f07615611e2c044fa4e635b0e26"
   name = "github.com/vmware/govmomi"
   packages = [
     ".",
@@ -71,8 +66,8 @@
     "vim25/xml",
   ]
   pruneopts = "UT"
-  revision = "3617f28d167d448f93f282a867870f109516d2a5"
-  version = "v0.19.0"
+  revision = "a0fef816799db3e430bb7a5ac951e7835fe4d56b"
+  version = "v0.21.0"
 
 [solve-meta]
   analyzer-name = "dep"
