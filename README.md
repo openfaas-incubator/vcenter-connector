@@ -1,4 +1,4 @@
-# vcenter-connector
+# OpenFaaS vcenter-connector
 
 vcenter-connector is an OpenFaaS [event-connector](https://docs.openfaas.com/reference/triggers/) built to consume events from vCenter and to trigger functions.
 
