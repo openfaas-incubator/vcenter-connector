@@ -79,7 +79,7 @@ See also:
 
 * [VEBA on GitHub](https://github.com/vmware-samples/vcenter-event-broker-appliance)
 
-* See also: [Blog post on VEBA by Doug Taliaferro](https://doogleit.github.io/2019/11/automate-host-maintenance-with-the-vcenter-event-broker-appliance/#) 
+* [Blog post on VEBA by Doug Taliaferro](https://doogleit.github.io/2019/11/automate-host-maintenance-with-the-vcenter-event-broker-appliance/#) 
 
 ## Contributing
 
