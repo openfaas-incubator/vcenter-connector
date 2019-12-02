@@ -67,19 +67,19 @@ The default path is `/var/openfaas/secrets/` which can be overridden by setting 
 
 ## Examples / community
 
-You can find a detailed example using vSphere tags for `VmPoweredOnEvent` [here](docs/example.md).
+* You can find a detailed example using vSphere tags for `VmPoweredOnEvent` [here](docs/example.md).
 
-Robert Guske of VMware write up a detailed [blog post](https://rguske.github.io/post/event-driven-interactions-with-vsphere-using-functions-as-a-service/) on how he automated the integration between several VMware products with OpenFaaS and this vcenter-connector.
+* Robert Guske of VMware write up a detailed [blog post](https://rguske.github.io/post/event-driven-interactions-with-vsphere-using-functions-as-a-service/) on how he automated the integration between several VMware products with OpenFaaS and this vcenter-connector.
 
-### VEBA / VMware
+### VEBA
 
-VMware have released an appliance which packages OpenFaaS and the vcenter-connector and called it "VEBA".
+VMware have released an appliance which packages [OpenFaaS](https://github.com/openfaas/faas) and the OpenFaaS vcenter-connector (this repository) and called it "VEBA". The appliance uses [Photon OS](https://vmware.github.io/photon/).
 
-See also: 
-
-* [VEBA on GitHub](https://github.com/vmware-samples/vcenter-event-broker-appliance)
+* [Audit VM configuration changes using the vCenter Event Broker by Dennis Zimmer](https://itnext.io/audit-vm-configuration-changes-using-the-vcenter-event-broker-45f9f5ba21f2)
 
 * [Blog post on VEBA by Doug Taliaferro](https://doogleit.github.io/2019/11/automate-host-maintenance-with-the-vcenter-event-broker-appliance/#) 
+
+* [VEBA on GitHub](https://github.com/vmware-samples/vcenter-event-broker-appliance)
 
 ## Contributing
 
